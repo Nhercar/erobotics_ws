@@ -12,7 +12,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Ejecutar el contenedor
 sudo docker run -it --rm \
-    --name ros2_jazzy \
+    --name ros2_jazzy_erobotics \
     --network host \
     --privileged \
     --device /dev/dri:/dev/dri \
@@ -22,4 +22,4 @@ sudo docker run -it --rm \
     --volume /tmp/.X11-unix:/tmp/.X11-unix:rw \
     --volume "$DIR":/home/sistemas/erobotics_ws:rw \
     --hostname sistemas \
-    $IMAGE_NAME
+    $IMAGE_NAME 
