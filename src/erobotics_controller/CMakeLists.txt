@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(erobotics_description)
+project(erobotics_controller)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -7,16 +7,13 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(urdf REQUIRED)
-find_package(robot_state_publisher REQUIRED)
-find_package(rviz2 REQUIRED)
+find_package(controller_manager REQUIRED)
+find_package(joint_state_broadcaster REQUIRED)
+find_package(joint_trajectory_controller REQUIRED)
+find_package(xacro REQUIRED)
 
-install(DIRECTORY
-  launch
-  urdf
-  meshes
-  rviz
-  worlds
+install(
+  DIRECTORY config
   DESTINATION share/${PROJECT_NAME}
 )
 

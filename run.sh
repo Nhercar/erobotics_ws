@@ -16,6 +16,7 @@ sudo docker run -it --rm \
     --network host \
     --privileged \
     --device /dev/dri:/dev/dri \
+    --group-add video \
     --env="DISPLAY=$DISPLAY" \
     --env="QT_X11_NO_MITSHM=1" \
     --env="XDG_RUNTIME_DIR=/tmp/runtime-sistemas" \

@@ -3,47 +3,67 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
-from launch.substitutions import Command
+from launch.substitutions import Command, LaunchConfiguration
+from launch.actions import DeclareLaunchArgument
 
 def generate_launch_description():
     # 1. Path to your package and URDF
     pkg_share = get_package_share_directory('erobotics_description')
-    urdf_file = os.path.join(pkg_share, 'urdf', 'mycobot_280_arduino_adaptive_gripper.urdf')
+    urdf_file = os.path.join(pkg_share, 'urdf', 'mycobot_280_arduino.urdf.xacro')
 
-    # 2. Read the URDF file content
-    # Using ParameterValue helps Jazzy handle the string correctly
-    with open(urdf_file, 'r') as infp:
-        robot_description_content = infp.read()
+    use_gripper_arg = DeclareLaunchArgument(
+        'use_gripper',
+        default_value='true',
+        description='Indica si se debe cargar la pinza (true/false)'
+    )
 
-    return LaunchDescription([
-        # Robot State Publisher
-        Node(
+    model_arg = DeclareLaunchArgument(
+        name="model", 
+        default_value= urdf_file,
+        description="Absolute path to the robot urdf file"
+    )
+
+    robot_description_content = ParameterValue(Command([
+        "xacro ", LaunchConfiguration("model"),
+        ' use_gripper:=', LaunchConfiguration("use_gripper")])
+        , value_type=str)
+
+    robot_state_publisher = Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
             name='robot_state_publisher',
             output='screen',
             parameters=[{
                 'robot_description': robot_description_content,
-                'use_sim_time': False # Set to True if using Gazebo/Isaac Sim
             }]
-        ),
-
-        # Joint State Publisher GUI (to move the MyCobot joints)
-        Node(
+        )
+    
+    joint_state_publisher = Node(
             package='joint_state_publisher_gui',
             executable='joint_state_publisher_gui',
             name='joint_state_publisher_gui'
-        ),
-
-        # RViz2
-        Node(
+        )
+    
+    rviz_node = Node(
             package='rviz2',
             executable='rviz2',
             name='rviz2',
             output='screen',
-            # This env var fix handles the Snap error we discussed earlier
-            env={
-                'LD_LIBRARY_PATH': '/opt/ros/jazzy/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:' + os.environ.get('LD_LIBRARY_PATH', '')
-            } 
+            arguments=["-d", os.path.join(get_package_share_directory("erobotics_description"), "rviz", "display.rviz")]
         )
+    
+    
+    
+    
+    
+    
+    return LaunchDescription([
+        use_gripper_arg,
+        model_arg,
+        # Robot State Publisher
+        robot_state_publisher,
+        # Joint State Publisher GUI (to move the MyCobot joints)
+        joint_state_publisher,      
+        # RViz2
+        rviz_node       
     ])
