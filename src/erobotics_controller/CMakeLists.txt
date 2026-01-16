@@ -13,7 +13,7 @@ find_package(joint_trajectory_controller REQUIRED)
 find_package(xacro REQUIRED)
 
 install(
-  DIRECTORY config
+  DIRECTORY config launch
   DESTINATION share/${PROJECT_NAME}
 )
 

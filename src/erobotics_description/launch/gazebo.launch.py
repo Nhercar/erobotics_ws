@@ -6,10 +6,11 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, Regi
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, Command
+from launch.conditions import IfCondition, UnlessCondition
 from launch_ros.actions import Node
 
 def generate_launch_description():
-    # 1. Rutas y directorios
+    # 1. Rutas y directoriosfrom launch.conditions import IfCondition, UnlessCondition
     pkg_description = get_package_share_directory('erobotics_description')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
     world_file = os.path.join(pkg_description, 'worlds', 'my_world.sdf')
@@ -79,41 +80,27 @@ def generate_launch_description():
 
     # 7. Bridge (Puente de comunicación entre ROS 2 y Gazebo)
     # Necesario para el reloj (/clock) y estados
-    bridge = Node(
+    base_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         output='screen',
         parameters=[{'use_sim_time': True}],
         arguments=[
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+        ]
+    )
+
+    camera_bridge = Node(
+        condition=IfCondition(LaunchConfiguration('use_camera')),
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        output='screen',
+        parameters=[{'use_sim_time': True}],
+        arguments=[
             '/robot/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
             '/robot/camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo'
         ]
     )
-
-    # 8. Controladores (Spawners de ros2_control)
-    # Primero el broadcaster de estados de articulaciones
-    # joint_state_broadcaster_spawner = Node(
-    #     package='controller_manager',
-    #     executable='spawner',
-    #     arguments=['joint_state_broadcaster'],
-    # )
-
-    # Controlador del brazo (debe coincidir con el nombre en tu archivo YAML/Xacro)
-    # arm_controller_spawner = Node(robot_state_publisher
-    #     package='controller_manager',
-    #     executable='spawner',
-    #     arguments=['arm_controller'],
-    # )
-
-    # Controlador del gripper (se lanza solo si use_gripper es true)
-    # Usamos una técnica de "delay" para esperar a que el robot aparezca
-    # gripper_controller_spawner = Node(
-    #     package='controller_manager',
-    #     executable='spawner',
-    #     arguments=['gripper_controller'],
-    #     condition=None # Podrías añadir lógica aquí si fuera necesario
-    # )
 
     return LaunchDescription([
         model_arg,
@@ -123,5 +110,6 @@ def generate_launch_description():
         robot_state_publisher,
         gazebo,
         spawn_robot,
-        bridge
+        base_bridge,
+        camera_bridge,        
     ])
