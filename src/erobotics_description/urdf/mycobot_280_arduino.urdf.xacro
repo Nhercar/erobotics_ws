@@ -88,7 +88,7 @@
  <!-- LLAMADA CONDICIONAL: Carga la camara si use_camera es true -->
   <xacro:if value="$(arg use_camera)">
     <xacro:rgb_camera parent="joint6" prefix="robot">
-      <origin xyz="0.03 0 0.02" rpy="0 0 0"/>
+      <origin xyz="0.03 0 0.02" rpy="0 0 -${pi/2}"/>
     </xacro:rgb_camera>
   </xacro:if>
 

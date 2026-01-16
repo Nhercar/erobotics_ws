@@ -56,6 +56,23 @@
       <mimic joint="gripper_controller" multiplier="1.0" offset="0" />
     </joint>
 
+
+  <!-- Definición de ros2_control para el Gripper -->
+    <!-- Articulación Maestra del Gripper -->
+
+  <ros2_control name="GazeboSimSystem" type="system">
+    <hardware>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+      <joint name="gripper_controller">
+        <command_interface name="position"/>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+  </ros2_control>
+
   </xacro:macro>
 
 </robot>
