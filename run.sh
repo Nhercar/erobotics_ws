@@ -21,7 +21,7 @@ sudo docker run -it --rm \
     --group-add video \
     --env="DISPLAY=$DISPLAY" \
     --env="QT_X11_NO_MITSHM=1" \
-    --env="XDG_RUNTIME_DIR=/tmp/runtime-sistemas" \
+    --env="RMW_IMPLEMENTATION=rmw_fastrtps_cpp" \
     --volume /tmp/.X11-unix:/tmp/.X11-unix:rw \
     --volume "$DIR":/home/sistemas/erobotics_ws:rw \
     --hostname sistemas \
